@@ -1,0 +1,3 @@
+migrations/versions/**
+**_pycache__
+venv/
