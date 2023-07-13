@@ -1,10 +1,12 @@
 from typing import List, Union
 from uuid import UUID
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 
 from dal.user_db_service import UserDal
+from model.user_model import User
 from schema.user_schema import ShowDeletedUpdatedUser, UpdateUser, ShowUser, UserCreate
 from config.hashing import Hasher
+from service import auth_service
 
 
 class UserService:
@@ -44,21 +46,14 @@ class UserService:
             return ShowDeletedUpdatedUser(user_id=deleted_user_id)
 
     @classmethod
-    async def get_user_by_id(cls, user_id: UUID, session) -> Union[ShowUser, None]:
-        async with session.begin():
-            user_dal = UserDal(session)
-            user = await user_dal.get_user_by_id(user_id)
-            if user is None:
-                raise HTTPException(
-                    status_code=404, detail="User with this id not found"
-                )
-            return ShowUser(
-                user_id=user.user_id,
-                name=user.name,
-                surname=user.surname,
-                email=user.email,
-                is_active=user.is_active,
-            )
+    async def get_user_by_id(cls, user: User) -> Union[ShowUser, None]:
+        return ShowUser(
+            user_id=user.user_id,
+            name=user.name,
+            surname=user.surname,
+            email=user.email,
+            is_active=user.is_active,
+        )
 
     @classmethod
     async def update_user_by_id(
