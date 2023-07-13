@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from model import User
 from service import AuthService
 from schema import SignInSchema, TokenSchema
-from config import get_db, create_access_token
+from config import get_db
+from service.auth_service import create_access_token
 
 login_router = APIRouter()
 

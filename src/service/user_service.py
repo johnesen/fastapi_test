@@ -7,6 +7,7 @@ from dal import UserDal
 from model import User
 from schema import ShowDeletedUpdatedUser, UpdateUser, ShowUser, UserCreate
 from config import Hasher
+from .auth_service import SendEmailService
 
 
 class UserService:
@@ -19,6 +20,12 @@ class UserService:
                 surname=body.surname,
                 email=body.email,
                 hashed_password=Hasher.hash_password(body.password),
+                code=await SendEmailService.generate_code(),
+            )
+            await SendEmailService.send_email(
+                user.email,
+                f"your code: {user.code}",
+                "Verification",
             )
             return ShowUser(
                 user_id=user.user_id,

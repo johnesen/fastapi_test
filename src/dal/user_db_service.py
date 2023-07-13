@@ -11,7 +11,7 @@ class UserDal:
         self.db_session = db_session
 
     async def create_user(
-        self, name: str, surname: str, email: str, hashed_password: str
+        self, name: str, surname: str, email: str, hashed_password: str, code: str
     ) -> User:
         query = select(User).where(User.email == email)
         user_exist = await self.db_session.execute(query)
@@ -20,7 +20,11 @@ class UserDal:
                 status_code=400, detail="User with this email alreay exist"
             )
         new_user = User(
-            name=name, surname=surname, email=email, hashed_password=hashed_password
+            name=name,
+            surname=surname,
+            email=email,
+            hashed_password=hashed_password,
+            code=code,
         )
         self.db_session.add(new_user)
         await self.db_session.flush()
