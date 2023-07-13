@@ -1,12 +1,10 @@
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import Depends, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config.db_config import get_db
-from config.security import create_access_token
-from model.user_model import User
+from model import User
 from service import AuthService
-from schema.auth_schema import SignInSchema, TokenSchema
+from schema import SignInSchema, TokenSchema
+from config import get_db, create_access_token
 
 login_router = APIRouter()
 

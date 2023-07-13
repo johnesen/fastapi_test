@@ -4,21 +4,16 @@ from uuid import UUID
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
-from jose import JWTError
+from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
-from config import settings
-from config.db_config import get_db
-from config.hashing import Hasher
+from config import Hasher, get_db, ALGORITHM, SECRET_KEY
 from dal import UserDal
 from model import User
-from schema.user_schema import ShowUser
 
 
 class AuthService:
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/signin")
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/signin")
 
     @staticmethod
     async def _get_user_by_id_for_auth(user_id: UUID, session: AsyncSession):
@@ -48,9 +43,7 @@ class AuthService:
         cls, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
     ):
         try:
-            payload = jwt.decode(
-                token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-            )
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_id: str = payload.get("user_id")
             if user_id is None:
                 raise HTTPException(status_code=403, detail="Token not valid")

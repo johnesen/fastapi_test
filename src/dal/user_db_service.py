@@ -1,6 +1,6 @@
-from typing import List, Union
+from typing import Union
 from fastapi import HTTPException
-from sqlalchemy import select, update, insert
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from model.user_model import User
 from uuid import UUID

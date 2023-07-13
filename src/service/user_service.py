@@ -1,12 +1,12 @@
 from typing import List, Union
 from uuid import UUID
-from fastapi import Depends, HTTPException
 
-from dal.user_db_service import UserDal
-from model.user_model import User
-from schema.user_schema import ShowDeletedUpdatedUser, UpdateUser, ShowUser, UserCreate
-from config.hashing import Hasher
-from service import auth_service
+from fastapi import HTTPException
+
+from dal import UserDal
+from model import User
+from schema import ShowDeletedUpdatedUser, UpdateUser, ShowUser, UserCreate
+from config import Hasher
 
 
 class UserService:
