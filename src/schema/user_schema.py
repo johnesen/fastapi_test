@@ -31,14 +31,6 @@ class UpdateUser(BaseModel):
     surname: Optional[constr(min_length=1)]
     email: Optional[EmailStr]
 
-class user(BaseModel):
-    user_id: uuid.UUID
-    name: str
-    surname: str
-    email: EmailStr
-    is_active: bool
-    hashed_password: str
-
 class UserCreate(BaseModel):
     name: str
     surname: str

@@ -17,4 +17,3 @@ async def get_db() -> Generator:
         yield session
     except:
         await session.close()
-
