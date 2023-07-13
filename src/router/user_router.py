@@ -6,13 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import get_db
 from schema.user_schema import ShowDeletedUpdatedUser, ShowUser, UserCreate, UpdateUser
 from service.user_service import UserService
-from config.db_config import database
 
 user_router = APIRouter()
 
-
-def get_user_service():
-    return UserService(database)
 
 @user_router.post("/", response_model=ShowUser, status_code=201)
 async def createUser(body: UserCreate, db: AsyncSession = Depends(get_db)) -> ShowUser:
