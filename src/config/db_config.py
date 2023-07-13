@@ -8,7 +8,6 @@ engine = create_async_engine(settings.DATABASE_URL, future=True, echo=True)
 
 async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
-database = Database(settings.DATABASE_URL)
 Base = declarative_base()
 
 
