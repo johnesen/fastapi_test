@@ -31,15 +31,9 @@ class UpdateUser(BaseModel):
     surname: Optional[constr(min_length=1)]
     email: Optional[EmailStr]
 
-class user(BaseModel):
-    user_id: uuid.UUID
-    name: str
-    surname: str
-    email: EmailStr
-    is_active: bool
-    hashed_password: str
 
-class UserCreate(BaseModel):
+
+class UserCreateBodySchema(BaseModel):
     name: str
     surname: str
     email: EmailStr
@@ -62,3 +56,11 @@ class UserCreate(BaseModel):
             )
 
         return value
+
+class UserCreateSchema(BaseModel):
+    user_id: uuid.UUID = uuid.uuid4()
+    is_active: bool = True
+    name: str
+    surname: str
+    email: EmailStr
+    hashed_password: str
