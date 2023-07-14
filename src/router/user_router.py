@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import BackgroundTasks, Depends
 from fastapi.routing import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,13 +6,30 @@ from model import User
 from config import get_db
 from service import AuthService, UserService
 from schema import ShowDeletedUpdatedUser, ShowUser, UserCreate, UpdateUser
+from service.send_email import SendEmailService
 
 user_router = APIRouter()
 
 
 @user_router.post("/signup", response_model=ShowUser, status_code=201)
-async def createUser(body: UserCreate, db: AsyncSession = Depends(get_db)) -> ShowUser:
-    return await UserService.create_new_user(body, db)
+async def createUser(
+    body: UserCreate,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+) -> ShowUser:
+    user = await UserService.create_new_user(body, db)
+    SendEmailService.send_email_background(
+        background_tasks,
+        "Verification",
+        user.email,
+        f"your code: {user.code}",
+    )
+    return ShowUser(
+        user_id=user.user_id,
+        name=user.name,
+        surname=user.surname,
+        email=user.email,
+    )
 
 
 @user_router.delete("/profile", response_model=ShowDeletedUpdatedUser, status_code=202)

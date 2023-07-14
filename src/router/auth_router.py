@@ -2,6 +2,7 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from model import User
+from schema.auth_schema import AuthResponse, CodeVerification
 from service import AuthService
 from schema import SignInSchema, TokenSchema
 from config import get_db
@@ -20,3 +21,17 @@ async def signin(body: SignInSchema, db: AsyncSession = Depends(get_db)) -> Toke
 @login_router.get("/profile", status_code=200)
 async def signin(current_user: User = Depends(AuthService.get_current_user_from_token)):
     return current_user
+
+
+@login_router.post("/verify", response_model=AuthResponse, status_code=200)
+async def signin(body: CodeVerification, db: AsyncSession = Depends(get_db)):
+    verified = await AuthService.veriify_by_code(body.code, db)
+    user = await AuthService._get_user_by_id_for_auth(verified, db)
+    access_token = create_access_token(user=user)
+    return AuthResponse(
+        user_id=user.user_id,
+        name=user.name,
+        surname=user.surname,
+        email=user.email,
+        token=TokenSchema(access_token=access_token, token_type="Bearer"),
+    )

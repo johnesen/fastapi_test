@@ -5,19 +5,11 @@ from uuid import UUID
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
 from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Hasher, get_db, ALGORITHM, SECRET_KEY
-from config.settings import (
-    MAIL_FROM,
-    MAIL_FROM_NAME,
-    MAIL_PASSWORD,
-    MAIL_PORT,
-    MAIL_SERVER,
-    MAIL_USERNAME,
-)
+
 from dal import UserDal
 from model import User
 
@@ -83,38 +75,11 @@ class AuthService:
             raise HTTPException(status_code=404, detail="User not found")
         return user
 
-
-class SendEmailService:
-    conf = ConnectionConfig(
-        MAIL_USERNAME=MAIL_USERNAME,
-        MAIL_PASSWORD=MAIL_PASSWORD,
-        MAIL_FROM=MAIL_FROM,
-        MAIL_PORT=MAIL_PORT,
-        MAIL_SERVER=MAIL_SERVER,
-        MAIL_FROM_NAME=MAIL_FROM_NAME,
-        MAIL_STARTTLS=True,
-        MAIL_SSL_TLS=False,
-        USE_CREDENTIALS=True,
-        # TEMPLATE_FOLDER='./templates/email'
-    )
-
     @classmethod
-    async def send_email(cls, email_to: str, body: str, subject: str):
-        message = MessageSchema(
-            subject=subject,
-            recipients=[email_to],
-            body=body,
-            subtype="html",
-        )
-
-        fm = FastMail(cls.conf)
-        await fm.send_message(
-            message,
-            # template_name="email.html",
-        )
-
-    @staticmethod
-    async def generate_code():
-        digit = str(random.randint(1, 999_999))
-        code = digit if len(digit) == 6 else "0" * (6 - len(digit)) + digit
-        return code
+    async def veriify_by_code(cls, code: str, session) -> User:
+        async with session.begin():
+            user_dal = UserDal(session)
+            user = await user_dal.verify_user_by_verify_code(code)
+            if user is None:
+                raise HTTPException(status_code=404, detail="User not found")
+            return user

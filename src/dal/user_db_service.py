@@ -56,6 +56,18 @@ class UserDal:
         if user_row is not None:
             return user_row[0]
 
+    async def verify_user_by_verify_code(self, code: str) -> User:
+        query = (
+            update(User)
+            .where(User.code == code)
+            .values(code=None, is_verified=True)
+            .returning(User)
+        )
+        res = await self.db_session.execute(query)
+        user_row = res.fetchone()
+        if user_row is not None:
+            return user_row[0]
+
     async def update_user(self, user_id, **kwargs) -> Union[UUID, None]:
         query = (
             update(User)
