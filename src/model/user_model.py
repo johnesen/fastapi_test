@@ -1,9 +1,9 @@
 import uuid
-from sqlalchemy import Column, Boolean, String
+
+from sqlalchemy import Boolean, Column, String
 from sqlalchemy.dialects.postgresql import UUID
 
 from config.db_config import Base
-
 
 
 class User(Base):

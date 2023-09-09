@@ -1,24 +1,17 @@
-import random
+from datetime import datetime, timedelta
 from typing import Union
 from uuid import UUID
 
-from fastapi import Depends
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config import Hasher, get_db, ALGORITHM, SECRET_KEY
-
+from config import ALGORITHM, SECRET_KEY, Hasher, get_db
+from config.settings import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from dal import UserDal
 from model import User
-
-
-from datetime import timedelta, datetime
-from jose import jwt
-
 from model.user_model import User
-from config.settings import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 
 
 def create_access_token(user: User) -> str:

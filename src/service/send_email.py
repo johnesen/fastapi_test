@@ -1,6 +1,8 @@
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
-from fastapi import BackgroundTasks
 import random
+
+from fastapi import BackgroundTasks
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
+
 from config.settings import (
     MAIL_FROM,
     MAIL_FROM_NAME,
@@ -19,8 +21,8 @@ class SendEmailService:
         MAIL_PORT=MAIL_PORT,
         MAIL_SERVER=MAIL_SERVER,
         MAIL_FROM_NAME=MAIL_FROM_NAME,
-        MAIL_STARTTLS=True,
-        MAIL_SSL_TLS=False,
+        # MAIL_STARTTLS=True,
+        # MAIL_SSL_TLS=False,
         USE_CREDENTIALS=True,
         # TEMPLATE_FOLDER='./templates/email'
     )

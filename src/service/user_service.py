@@ -1,14 +1,14 @@
 from typing import List, Union
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 
+from config import Hasher
 from dal import UserDal
 from model import User
-from schema import ShowDeletedUpdatedUser, UpdateUser, ShowUser, UserCreate
-from config import Hasher
+from schema import ShowDeletedUpdatedUser, ShowUser, UpdateUser, UserCreate
+
 from .send_email import SendEmailService
-from fastapi import BackgroundTasks
 
 
 class UserService:
