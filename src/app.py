@@ -1,6 +1,6 @@
-import uvicorn
 from admin.user_views import UserView
 from config.db_config import sync_engine
+from decouple import config
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from flask import Flask
@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 db = Session(sync_engine)
 
 flask_app = Flask(__name__)
-flask_app.config["SECRET_KEY"] = "secret"
+flask_app.config["SECRET_KEY"] = config("SECRET_KEY")
 
 app = FastAPI(title="some peace of sh...  test", redoc_url="/redoc")
 
