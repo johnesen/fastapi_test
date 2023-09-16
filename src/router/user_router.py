@@ -1,22 +1,22 @@
+from typing import List
+
+from config import get_db
 from fastapi import BackgroundTasks, Depends
 from fastapi.routing import APIRouter
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from model import User
-from config import get_db
-from service import AuthService, UserService
-from schema import ShowDeletedUpdatedUser, ShowUser, UserCreate, UpdateUser
-from service.send_email import SendEmailService
+from schema import ShowUser, UpdateUser, UserCreate
+from service import AuthService, SendEmailService, UserService
+from sqlalchemy.ext.asyncio import AsyncSession
 
 user_router = APIRouter()
 
 
-@user_router.post("/signup", response_model=ShowUser, status_code=201)
+@user_router.post("/signup", status_code=201)
 async def createUser(
     body: UserCreate,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-) -> ShowUser:
+) -> dict:
     user = await UserService.create_new_user(body, db)
     SendEmailService.send_email_background(
         background_tasks,
@@ -24,30 +24,25 @@ async def createUser(
         user.email,
         f"your code: {user.code}",
     )
-    return ShowUser(
-        user_id=user.user_id,
-        name=user.name,
-        surname=user.surname,
-        email=user.email,
-    )
+    return {"message": f"{user.email} registered successfullly and code sent to email"}
 
 
-@user_router.delete("/profile", response_model=ShowDeletedUpdatedUser, status_code=202)
+@user_router.delete("/profile", status_code=204)
 async def deleteUser(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(AuthService.get_current_user_from_token),
-) -> ShowDeletedUpdatedUser:
-    return await UserService.delete_user(current_user.user_id, db)
+) -> None:
+    await UserService.delete_user(current_user.user_id, db)
 
 
 @user_router.get("/profile", response_model=ShowUser, status_code=200)
 async def getUserById(
     current_user: User = Depends(AuthService.get_current_user_from_token),
 ) -> ShowUser:
-    return await UserService.get_user_by_id(current_user)
+    return current_user
 
 
-@user_router.patch("/profile", response_model=ShowDeletedUpdatedUser, status_code=200)
+@user_router.patch("/profile", response_model=ShowUser, status_code=200)
 async def updateUserById(
     body: UpdateUser,
     db: AsyncSession = Depends(get_db),
@@ -56,3 +51,11 @@ async def updateUserById(
     return await UserService.update_user_by_id(
         user_id=current_user.user_id, body=body, session=db
     )
+
+
+@user_router.get("/list", response_model=List[ShowUser], status_code=200)
+async def updateUserById(
+    db: AsyncSession = Depends(get_db),
+) -> List[ShowUser]:
+    user = await UserService.get_all_users(db)
+    return user

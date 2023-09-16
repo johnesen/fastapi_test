@@ -1,6 +1,5 @@
 from decouple import config
 
-
 DATABASE_URL: str = config("DATABASE_URL")
 DATABASE_URL_ALEMBIC: str = config("DATABASE_URL_ALEMBIC")
 

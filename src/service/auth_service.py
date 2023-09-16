@@ -2,16 +2,15 @@ from datetime import datetime, timedelta
 from typing import Union
 from uuid import UUID
 
+from config import ALGORITHM, SECRET_KEY, Hasher, get_db
+from config.settings import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from config import ALGORITHM, SECRET_KEY, Hasher, get_db
-from config.settings import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
-from dal import UserDal
 from model import User
 from model.user_model import User
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def create_access_token(user: User) -> str:
@@ -32,14 +31,20 @@ class AuthService:
     @staticmethod
     async def _get_user_by_id_for_auth(user_id: UUID, session: AsyncSession):
         async with session.begin():
-            user_dal = UserDal(session)
-            return await user_dal.get_user_by_id(user_id=user_id)
+            query = select(User).where(User.user_id == user_id).limit(1)
+            res = await session.execute(query)
+            user = res.scalar()
+            await session.commit()
+            return user
 
     @staticmethod
     async def _get_user_by_email_for_auth(email: str, session: AsyncSession):
         async with session.begin():
-            user_dal = UserDal(session)
-            return await user_dal.get_user_by_email(email=email)
+            query = select(User).where(User.email == email).limit(1)
+            res = await session.execute(query)
+            user = res.scalar()
+            await session.commit()
+            return user
 
     @classmethod
     async def authenticate_user(
@@ -69,10 +74,19 @@ class AuthService:
         return user
 
     @classmethod
-    async def veriify_by_code(cls, code: str, session) -> User:
+    async def veriify_by_code(cls, code: str, session: AsyncSession) -> User:
         async with session.begin():
-            user_dal = UserDal(session)
-            user = await user_dal.verify_user_by_verify_code(code)
-            if user is None:
-                raise HTTPException(status_code=404, detail="User not found")
+            query = (
+                update(User)
+                .where(User.code == code)
+                .values(code=None, is_verified=True)
+                .returning(User)
+            )
+            res = await session.execute(query)
+            user = res.scalar()
+            await session.commit()
+            if not user:
+                raise HTTPException(
+                    status_code=400, detail="invalid code, because user not found"
+                )
             return user

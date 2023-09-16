@@ -1,29 +1,27 @@
 import re
 import uuid
 from typing import Optional
+
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, constr, validator
-
 from schema.base import TuneModel
 
-
 LETTER_MATCH_PATTERN = re.compile(r"^[a-zA-Z\-]+$")
+
 
 class ShowUser(TuneModel):
     user_id: uuid.UUID
     name: str
     surname: str
     email: EmailStr
-
-
-class ShowDeletedUpdatedUser(BaseModel):
-    user_id: uuid.UUID
+    is_verified: bool
 
 
 class UpdateUser(BaseModel):
     name: Optional[constr(min_length=1)]
     surname: Optional[constr(min_length=1)]
     email: Optional[EmailStr]
+
 
 class UserCreate(BaseModel):
     name: str
@@ -48,5 +46,3 @@ class UserCreate(BaseModel):
             )
 
         return value
-    
-

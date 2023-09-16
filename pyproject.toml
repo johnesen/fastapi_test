@@ -64,7 +64,7 @@ uvicorn = "0.22.0"
 virtualenv = "20.24.1"
 werkzeug = "2.3.7"
 wtforms = "3.0.1"
-flask-wtf = "^1.1.1"
+flask-wtf = "1.1.1"
 
 
 [build-system]

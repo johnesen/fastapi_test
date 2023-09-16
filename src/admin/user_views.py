@@ -1,8 +1,7 @@
+from config.hashing import Hasher
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import form
 from wtforms import fields
-
-from config.hashing import Hasher
 
 
 class AdminPasswordField(fields.PasswordField):
@@ -18,11 +17,15 @@ class UserViewCreateForm(form.Form):
     surname = fields.StringField("surname")
     email = fields.StringField("Email")
     hashed_password = AdminPasswordField("Password")
+    code = fields.StringField("code")
     is_active = fields.BooleanField("Is Active")
     is_verified = fields.BooleanField("Is Verified")
 
 
 class UserView(ModelView):
+    create_modal = True
+    edit_modal = True
+
     column_list = ("name", "surname", "email", "hashed_password")
     column_searchable_list = ("name", "email")
     column_filters = ("name", "email")
