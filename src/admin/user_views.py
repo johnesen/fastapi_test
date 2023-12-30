@@ -1,7 +1,8 @@
-from config.hashing import Hasher
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import form
 from wtforms import fields
+
+from config.hashing import Hasher
 
 
 class AdminPasswordField(fields.PasswordField):

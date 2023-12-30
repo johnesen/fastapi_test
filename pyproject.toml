@@ -65,6 +65,7 @@ virtualenv = "20.24.1"
 werkzeug = "2.3.7"
 wtforms = "3.0.1"
 flask-wtf = "1.1.1"
+pylint = "^3.0.3"
 
 
 [build-system]

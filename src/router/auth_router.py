@@ -1,8 +1,9 @@
-from config import get_db
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from config import get_db
 from schema import CodeVerification, SignInSchema, TokenSchema
 from service import AuthService, create_access_token
-from sqlalchemy.ext.asyncio import AsyncSession
 
 login_router = APIRouter()
 
@@ -15,7 +16,7 @@ async def signin(body: SignInSchema, db: AsyncSession = Depends(get_db)) -> Toke
 
 
 @login_router.post("/verify", response_model=TokenSchema, status_code=200)
-async def signin(
+async def verify(
     body: CodeVerification, db: AsyncSession = Depends(get_db)
 ) -> TokenSchema:
     verified = await AuthService.veriify_by_code(body.code, db)

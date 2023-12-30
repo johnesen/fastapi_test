@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import uuid
-from typing import Optional
+
+from sqlalchemy.orm import Mapped, mapped_column
 
 from config.db_config import Base
-from sqlalchemy.orm import Mapped, mapped_column
 
 
 class User(Base):
@@ -12,7 +14,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     surname: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
-    hashed_password: Mapped[Optional[str]] = mapped_column()
-    code: Mapped[Optional[str]] = mapped_column()
+    hashed_password: Mapped[str | None] = mapped_column()
+    code: Mapped[str | None] = mapped_column()
     is_verified: Mapped[bool] = mapped_column(default=False)
     is_active: Mapped[bool] = mapped_column(default=True)

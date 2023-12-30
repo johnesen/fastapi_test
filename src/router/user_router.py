@@ -1,17 +1,16 @@
-from typing import List
+from typing import Annotated, List
+
+from fastapi import BackgroundTasks, Depends
+from fastapi.routing import APIRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import get_db
-from fastapi import BackgroundTasks, Depends
-from typing import Annotated
-from fastapi.routing import APIRouter
 from model import User
 from schema import ShowUser, UpdateUser, UserCreate
 from service import AuthService, SendEmailService, UserService
-from sqlalchemy.ext.asyncio import AsyncSession
 
 user_router = APIRouter()
 currentUser = Annotated[User, Depends(AuthService.get_current_user_from_token)]
-
 
 
 @user_router.post("/signup", status_code=201)
@@ -52,6 +51,6 @@ async def updateUserById(
 
 
 @user_router.get("/list", response_model=List[ShowUser], status_code=200)
-async def updateUserById(db: AsyncSession = Depends(get_db)) -> List[ShowUser]:
+async def getUsers(db: AsyncSession = Depends(get_db)):
     user = await UserService.get_all_users(db)
     return user

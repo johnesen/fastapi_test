@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import re
 import uuid
-from typing import Optional
 
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, constr, validator
+
 from schema.base import TuneModel
 
 LETTER_MATCH_PATTERN = re.compile(r"^[a-zA-Z\-]+$")
@@ -18,9 +20,9 @@ class ShowUser(TuneModel):
 
 
 class UpdateUser(BaseModel):
-    name: Optional[constr(min_length=1)]
-    surname: Optional[constr(min_length=1)]
-    email: Optional[EmailStr]
+    name: (constr(min_length=1) | None)
+    surname: (constr(min_length=1) | None)
+    email: (EmailStr | None)
 
 
 class UserCreate(BaseModel):

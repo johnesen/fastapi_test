@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
-from typing import Union
 from uuid import UUID
 
-from config import ALGORITHM, SECRET_KEY, Hasher, get_db
-from config.settings import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from model import User
-from model.user_model import User
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, Hasher, get_db
+from model import User
+
+POSTGRES_HOST = "localhost"
 
 
 def create_access_token(user: User) -> str:
@@ -49,7 +51,7 @@ class AuthService:
     @classmethod
     async def authenticate_user(
         cls, email: str, password: str, db: AsyncSession
-    ) -> Union[User, None]:
+    ) -> (User | None):
         user = await cls._get_user_by_email_for_auth(email=email, session=db)
         if user is None or not user.is_active:
             raise HTTPException(status_code=404, detail="User not found")
@@ -66,8 +68,10 @@ class AuthService:
             user_id: str = payload.get("user_id")
             if user_id is None:
                 raise HTTPException(status_code=403, detail="Token not valid")
-        except JWTError:
-            raise HTTPException(status_code=403, detail="Token not valid or expired")
+        except JWTError as e:
+            raise HTTPException(
+                status_code=403, detail="Token not valid or expired"
+            ) from e
         user = await cls._get_user_by_id_for_auth(user_id=user_id, session=db)
         if user is None or not user.is_active:
             raise HTTPException(status_code=404, detail="User not found")

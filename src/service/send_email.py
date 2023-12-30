@@ -1,5 +1,8 @@
 import random
 
+from fastapi import BackgroundTasks
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
+
 from config.settings import (
     MAIL_FROM,
     MAIL_FROM_NAME,
@@ -8,24 +11,23 @@ from config.settings import (
     MAIL_SERVER,
     MAIL_USERNAME,
 )
-from fastapi import BackgroundTasks
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
+
+conf = ConnectionConfig(
+    MAIL_USERNAME=MAIL_USERNAME,
+    MAIL_PASSWORD=MAIL_PASSWORD,
+    MAIL_FROM=MAIL_FROM,
+    MAIL_PORT=MAIL_PORT,
+    MAIL_SERVER=MAIL_SERVER,
+    MAIL_FROM_NAME=MAIL_FROM_NAME,
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
+    USE_CREDENTIALS=True,
+    # TEMPLATE_FOLDER='./templates/email'
+)
+fm = FastMail(conf)
 
 
 class SendEmailService:
-    conf = ConnectionConfig(
-        MAIL_USERNAME=MAIL_USERNAME,
-        MAIL_PASSWORD=MAIL_PASSWORD,
-        MAIL_FROM=MAIL_FROM,
-        MAIL_PORT=MAIL_PORT,
-        MAIL_SERVER=MAIL_SERVER,
-        MAIL_FROM_NAME=MAIL_FROM_NAME,
-        MAIL_TLS=True,
-        MAIL_SSL=False,
-        USE_CREDENTIALS=True,
-        # TEMPLATE_FOLDER='./templates/email'
-    )
-
     @classmethod
     async def send_email(cls, email_to: str, body: str, subject: str):
         message = MessageSchema(
@@ -35,7 +37,6 @@ class SendEmailService:
             subtype="html",
         )
 
-        fm = FastMail(cls.conf)
         await fm.send_message(
             message,
             # template_name="email.html",
@@ -49,7 +50,11 @@ class SendEmailService:
 
     @classmethod
     def send_email_background(
-        cls, background_tasks: BackgroundTasks, subject: str, email_to: str, body: dict
+        cls,
+        background_tasks: BackgroundTasks,
+        subject: str,
+        email_to: str,
+        body: dict,
     ):
         message = MessageSchema(
             subject=subject,
@@ -57,7 +62,6 @@ class SendEmailService:
             body=body,
             subtype="html",
         )
-        fm = FastMail(cls.conf)
         background_tasks.add_task(
             fm.send_message,
             message,
