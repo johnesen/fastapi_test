@@ -1,4 +1,4 @@
 migrations/versions/**
 **_pycache__
-venv/
+.venv/
 .env
