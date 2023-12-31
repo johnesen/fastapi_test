@@ -15,7 +15,7 @@ from .send_email import SendEmailService
 
 class UserService:
     @classmethod
-    async def create_new_user(cls, body: UserCreate, session: AsyncSession) -> ShowUser:
+    async def create(cls, body: UserCreate, session: AsyncSession) -> ShowUser:
         async with session.begin():
             query = select(User).where(User.email == body.email).limit(1)
             res = await session.execute(query)
@@ -37,21 +37,21 @@ class UserService:
             return new_user
 
     @classmethod
-    async def get_all_users(cls, session: AsyncSession):
+    async def get_users(cls, session: AsyncSession):
         async with session.begin():
-            query = select(User).where(User.is_active is True)
+            query = select(User).where(User.is_active == True)
             res = await session.execute(query)
             users = res.scalars().all()
             await session.commit()
             return users
 
     @classmethod
-    async def delete_user(cls, user_id, session: AsyncSession) -> dict:
+    async def delete(cls, user_id, session: AsyncSession) -> dict:
         async with session.begin():
             try:
                 query = (
                     update(User)
-                    .where(User.user_id == user_id, User.is_active is True)
+                    .where(User.user_id == user_id, User.is_active == True)
                     .values(is_active=False)
                 )
                 await session.execute(query)
@@ -61,23 +61,14 @@ class UserService:
                 return False
 
     @classmethod
-    async def get_user_by_id(cls, user: User) -> (ShowUser | None):
-        return ShowUser(
-            user_id=user.user_id,
-            name=user.name,
-            surname=user.surname,
-            email=user.email,
-        )
-
-    @classmethod
-    async def update_user_by_id(
+    async def update(
         cls, user_id: UUID, body: UpdateUser, session: AsyncSession
     ) -> (UUID | None):
         async with session.begin():
             update_data = body.dict(exclude_unset=True)
             query = (
                 update(User)
-                .where(User.user_id == user_id, User.is_active is True)
+                .where(User.user_id == user_id, User.is_active == True)
                 .values(update_data)
                 .returning(User)
             )

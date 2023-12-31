@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import BackgroundTasks, Depends
 from fastapi.routing import APIRouter
@@ -19,7 +19,7 @@ async def createUser(
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    user = await UserService.create_new_user(body, db)
+    user = await UserService.create(body, db)
     SendEmailService.send_email_background(
         background_tasks,
         "Verification",
@@ -33,24 +33,22 @@ async def createUser(
 async def deleteUser(
     current_user: currentUser, db: AsyncSession = Depends(get_db)
 ) -> None:
-    await UserService.delete_user(current_user.user_id, db)
+    await UserService.delete(current_user.user_id, db)
 
 
 @user_router.get("/profile", response_model=ShowUser, status_code=200)
-async def getUserById(current_user: currentUser) -> ShowUser:
+async def profile(current_user: currentUser) -> ShowUser:
     return current_user
 
 
 @user_router.patch("/profile", response_model=ShowUser, status_code=200)
-async def updateUserById(
+async def updateUser(
     body: UpdateUser, current_user: currentUser, db: AsyncSession = Depends(get_db)
 ) -> ShowUser:
-    return await UserService.update_user_by_id(
-        user_id=current_user.user_id, body=body, session=db
-    )
+    return await UserService.update(user_id=current_user.user_id, body=body, session=db)
 
 
-@user_router.get("/list", response_model=List[ShowUser], status_code=200)
+@user_router.get("/list", response_model=list[ShowUser], status_code=200)
 async def getUsers(db: AsyncSession = Depends(get_db)):
-    user = await UserService.get_all_users(db)
+    user: list[ShowUser] = await UserService.get_users(db)
     return user

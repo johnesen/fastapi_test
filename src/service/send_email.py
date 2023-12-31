@@ -22,7 +22,6 @@ conf = ConnectionConfig(
     MAIL_STARTTLS=True,
     MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
-    # TEMPLATE_FOLDER='./templates/email'
 )
 fm = FastMail(conf)
 
@@ -31,16 +30,10 @@ class SendEmailService:
     @classmethod
     async def send_email(cls, email_to: str, body: str, subject: str):
         message = MessageSchema(
-            subject=subject,
-            recipients=[email_to],
-            body=body,
-            subtype="html",
+            subject=subject, recipients=[email_to], body=body, subtype="html"
         )
 
-        await fm.send_message(
-            message,
-            # template_name="email.html",
-        )
+        await fm.send_message(message)
 
     @staticmethod
     async def generate_code():
@@ -50,20 +43,9 @@ class SendEmailService:
 
     @classmethod
     def send_email_background(
-        cls,
-        background_tasks: BackgroundTasks,
-        subject: str,
-        email_to: str,
-        body: dict,
+        cls, background_tasks: BackgroundTasks, subject: str, email_to: str, body: dict
     ):
         message = MessageSchema(
-            subject=subject,
-            recipients=[email_to],
-            body=body,
-            subtype="html",
+            subject=subject, recipients=[email_to], body=body, subtype="html"
         )
-        background_tasks.add_task(
-            fm.send_message,
-            message,
-            # template_name="email.html",
-        )
+        background_tasks.add_task(fm.send_message, message)

@@ -49,7 +49,7 @@ class AuthService:
             return user
 
     @classmethod
-    async def authenticate_user(
+    async def authenticate(
         cls, email: str, password: str, db: AsyncSession
     ) -> (User | None):
         user = await cls._get_user_by_email_for_auth(email=email, session=db)

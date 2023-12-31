@@ -12,11 +12,11 @@ LETTER_MATCH_PATTERN = re.compile(r"^[a-zA-Z\-]+$")
 
 
 class ShowUser(TuneModel):
-    user_id: uuid.UUID
-    name: str
-    surname: str
-    email: EmailStr
-    is_verified: bool
+    user_id: uuid.UUID | None
+    name: str | None
+    surname: str | None
+    email: EmailStr | None | str
+    is_verified: bool | None
 
 
 class UpdateUser(BaseModel):
