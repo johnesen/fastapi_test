@@ -99,14 +99,14 @@ disable=
     attribute-defined-outside-init,
     invalid-name,
     missing-docstring,
-    protected-access,
+    # protected-access,
     too-few-public-methods,
     # handled by black
-    format,
+    # format,
     # We anticipate #3512 where it will become optional
-    fixme,
-    cyclic-import,
-    import-error,
+    # fixme,
+    # cyclic-import,
+    # import-error,
 
 
 [REPORTS]
@@ -114,7 +114,10 @@ disable=
 # Set the output format. Available formats are text, parseable, colorized, msvs
 # (visual studio) and html. You can also give a reporter class, eg
 # mypackage.mymodule.MyReporterClass.
-output-format=text
+# output-format=text
+output-format=colorized
+# output-format=msvs
+# output-format=parseable
 
 # Tells whether to display a full report or only the messages
 reports=no
@@ -207,7 +210,7 @@ redefining-builtins-modules=six.moves,past.builtins,future.builtins,builtins,io
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=120
+max-line-length=88
 
 # Regexp for a line that is allowed to be longer than the limit.
 ignore-long-lines=^\s*(# )?<?https?://\S+>?$
@@ -558,7 +561,7 @@ check-quote-consistency=no
 
 # This flag controls whether the implicit-str-concat should generate a warning
 # on implicit string concatenation in sequences defined over several lines.
-check-str-concat-over-line-jumps=no
+check-str-concat-over-line-jumps=yes
 
 
 [CODE_STYLE]
@@ -566,4 +569,4 @@ check-str-concat-over-line-jumps=no
 # Max line length for which to sill emit suggestions. Used to prevent optional
 # suggestions which would get split by a code formatter (e.g., black). Will
 # default to the setting for ``max-line-length``.
-#max-line-length-suggestions=
+max-line-length-suggestions=88

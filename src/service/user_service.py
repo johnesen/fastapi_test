@@ -65,7 +65,7 @@ class UserService:
         cls, user_id: UUID, body: UpdateUser, session: AsyncSession
     ) -> (UUID | None):
         async with session.begin():
-            update_data = body.dict(exclude_unset=True)
+            update_data = body.model_dump(exclude_unset=True)
             query = (
                 update(User)
                 .where(User.user_id == user_id, User.is_active == True)
